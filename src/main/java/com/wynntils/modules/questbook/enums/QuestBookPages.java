@@ -18,7 +18,8 @@ public enum QuestBookPages {
     DIALOGUE(new DialoguePage(), 4),
     HUDCONFIG(new HUDConfigPage(), 5),
     DISCOVERIES(new DiscoveriesPage(), 6),
-    LOOTRUNS(new LootRunPage(), 7);
+    LOOTRUNS(new LootRunPage(), 7),
+    FRIENDS(new FriendsPage(), 8);
 
     private QuestBookPage questBookPage;
     private int slotNb;
