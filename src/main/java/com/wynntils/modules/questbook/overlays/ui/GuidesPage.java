@@ -73,7 +73,7 @@ public class GuidesPage extends QuestBookListPage<QuestBookPage> {
 
     @Override
     protected String getEmptySearchString() {
-        return  "No Guides were found!\n.";
+        return "No Guides were found!\n.";
     }
 
     @Override

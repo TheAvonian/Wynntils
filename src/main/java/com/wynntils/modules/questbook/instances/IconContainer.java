@@ -14,7 +14,7 @@ public enum IconContainer {
     discoveriesIcon(0, 16, 255, 287, true),
     lootrunIcon(16, 32, 287, 319, true),
     dialogueIcon(222, 236, 306, 317, false),
-    friendsIcon(222, 236, 306, 317, false);
+    friendsIcon(327, 348, 323, 338, false);
 
     private int x1, x2, y1, y2;
     private boolean highlightVariant;

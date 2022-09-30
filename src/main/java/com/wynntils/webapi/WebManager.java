@@ -847,6 +847,47 @@ public class WebManager {
         }
     }
 
+    public static class FriendUpdateThread extends Thread {
+        public FriendUpdateThread(String name) {
+            super(name);
+        }
+
+        @Override
+        public void run() {
+            RequestHandler handler = new RequestHandler();
+
+            try {
+                Thread.sleep(30000);
+                while (!isInterrupted()) {
+                    HashMap<String, TerritoryProfile> prevList = new HashMap<>(territories);
+                    updateTerritories(handler);
+                    handler.dispatch();
+                    for (TerritoryProfile prevTerritory : prevList.values()) {
+                        TerritoryProfile currentTerritory = territories.get(prevTerritory.getName());
+                        // TODO: Find out why sometimes the Unicode apostrophes are turned into unknown
+                        // Unicode characters
+                        // It seems to happen at random and seems to only happen to 1 territory at a
+                        // time and when it does both the field name and the territory name field inside
+                        // is turned into unknown Unicode characters (might have something to do with
+                        // the list of territories on the server)
+                        if (currentTerritory == null) {
+                            continue;
+                        } else if (!currentTerritory.getGuild().equals(prevTerritory.getGuild())) {
+                            FrameworkManager.getEventBus().post(new WynnGuildWarEvent(prevTerritory.getFriendlyName(), currentTerritory.getGuild(), prevTerritory.getGuild(), getGuildTagFromName(currentTerritory.getGuild()), getGuildTagFromName(prevTerritory.getGuild()), WynnGuildWarEvent.WarUpdateType.CAPTURED));
+                        } else if (prevTerritory.getAttacker() == null && currentTerritory.getAttacker() != null) {
+                            FrameworkManager.getEventBus().post(new WynnGuildWarEvent(prevTerritory.getFriendlyName(), currentTerritory.getAttacker(), prevTerritory.getGuild(), getGuildTagFromName(currentTerritory.getAttacker()), getGuildTagFromName(prevTerritory.getGuild()), WynnGuildWarEvent.WarUpdateType.ATTACKED));
+                        } else if (prevTerritory.getAttacker() != null && currentTerritory.getAttacker() == null) {
+                            FrameworkManager.getEventBus().post(new WynnGuildWarEvent(prevTerritory.getFriendlyName(), prevTerritory.getAttacker(), currentTerritory.getGuild(), getGuildTagFromName(prevTerritory.getAttacker()), getGuildTagFromName(currentTerritory.getGuild()), WynnGuildWarEvent.WarUpdateType.DEFENDED));
+                        }
+                    }
+                    Thread.sleep(30000);
+                }
+            } catch (InterruptedException ignored) {
+            }
+            Reference.LOGGER.info("Terminating territory update thread.");
+        }
+    }
+
     private static final Comparator<String> SEM_VER_COMPARATOR = (a, b) -> {
         String[] aParts = StringUtils.split(a, '.');
         String[] bParts = StringUtils.split(b, '.');
